@@ -21,7 +21,7 @@
 
 #define SHAREDMEM 1000
 #define BUFFERSIZE 15
-void * Producer();
+void * Producer(void *);
 void * Consumer();
 void DestroySemaphores();
 void CreateSemaphores();
@@ -62,7 +62,7 @@ int main(int argc, const char * argv[]) {
     for (int i = 0; i < BUFFERSIZE; ++i) {
         buffer->buf[i] = '\0';
     }
-    thread1 = pthread_create(&producerThread, NULL, Producer, NULL);
+    thread1 = pthread_create(&producerThread, NULL, Producer, (void*)argv);
     if (thread1 != 0) {
         perror("Error creating Producer Thread");
         return 1;
@@ -89,11 +89,12 @@ int main(int argc, const char * argv[]) {
 /*-------------------------------------------------------------------------*/
 /*-------------------------------------------------------------------------*/
 /* Producer and Consumer function definitions */
-void * Producer(){
+void * Producer(void * arguments){
+    char ** string = (char**)arguments; 
     int newChar;
     unsigned int i = 0;
     FILE * fp;
-    fp = fopen("mytest.dat", "r");
+    fp = fopen(string[1], "r");
     if (fp == NULL) {
         printf("File could not be opened.\n");
         buffer->eofFlag = true;
